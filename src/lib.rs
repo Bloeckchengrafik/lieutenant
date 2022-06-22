@@ -27,6 +27,7 @@ mod tests {
             }
         });
 
-        let _r = x.call((0, "test"), "/ 100 ").unwrap();
+        let r = x.call((0, "test"), "/ 100 ").unwrap();
+        assert!(r == 42);
     }
 }
