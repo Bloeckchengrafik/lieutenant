@@ -5,7 +5,9 @@ Command dispatcher for Rust based on Mojang's Brigadier
 # Table of Contents
 
 - [Installation](#installation)
-- [A simple Example](#a-simple-example)
+- [A simple example](#a-simple-example)
+- [Contributing](#contributing)
+- [License](#license)
 
 # Installation
 
@@ -56,3 +58,12 @@ With `move |game_state, ...|`, one can access the game state given by the call m
 A command can be called by the return value of the `on_call` method. Here, a Game State can be passed to the closure. The second argument is the command to parse.
 The Return value of the closure or an error is returned here.
 
+# Contributing
+
+Check out our [issue tracker](https://github.com/feather-rs/lieutenant/issues) to find out what needs to be worked on. Feel free to join our [Discord](https://discordapp.com/invite/4eYmK69) and ask questions whenever you need. Thanks for your interest in contributing!
+
+# License
+
+This project is licenced under the MIT and Apache licence.
+
+See [MIT](LICENSE-MIT.md) and [Apache](LICENSE-APACHE.md) for more information.
