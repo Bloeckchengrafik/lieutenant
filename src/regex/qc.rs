@@ -7,7 +7,7 @@ use std::{collections::HashSet, iter};
 #[cfg(test)]
 const MAX_LIT_LEN: usize = 2; // How many chars the string literals should be.
 #[cfg(test)]
-const DEBTH: usize = 5; // How deep the nfa should be.
+const DEPTH: usize = 5; // How deep the nfa should be.
 
 /*
 This file contains code for generating testcases for quickcheck.
@@ -102,7 +102,7 @@ pub struct NFAQtCase {
 #[cfg(test)]
 impl Arbitrary for NFAQtCase {
     fn arbitrary(g: &mut quickcheck::Gen) -> Self {
-        let limit = DEBTH;
+        let limit = DEPTH;
         let mut level = g.size();
         level = if level <= limit { level } else { limit };
 

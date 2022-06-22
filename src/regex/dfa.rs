@@ -17,11 +17,11 @@ pub struct DfaState<A> {
 
     // A byteclass is a [u8; 256], and says how to move from
     // one state to another. If lets say dfa[self.class][c] == 5, then in
-    // terms of a dfa pictoral representatuion, we have a edge going from
-    // self to self.table[c], with the value 5 assosiated with that edge.
+    // terms of a dfa pictorial representation, we have a edge going from
+    // self to self.table[c], with the value 5 associated with that edge.
     class: ByteClassId,
 
-    assosiations: HashSet<A>,
+    associations: HashSet<A>,
 }
 
 impl<A> DfaState<A> {
@@ -29,15 +29,15 @@ impl<A> DfaState<A> {
         Self {
             table: vec![None],
             class: ByteClassId(0),
-            assosiations: HashSet::new(),
+            associations: HashSet::new(),
         }
     }
 }
 
 impl<A: Eq + std::hash::Hash> DfaState<A> {
     #[cfg(test)]
-    pub fn is_assosiated_with(&self, value: &A) -> bool {
-        self.assosiations.contains(value)
+    pub fn is_associated_with(&self, value: &A) -> bool {
+        self.associations.contains(value)
     }
 }
 
@@ -123,15 +123,15 @@ impl<A: std::hash::Hash + Eq + Clone> DFA<A> {
         self.states[id.0 as usize].class = class_id;
     }
 
-    pub(crate) fn assosiate(&mut self, id: StateId, assosiated_values: HashSet<A>) {
+    pub(crate) fn associate(&mut self, id: StateId, assosiated_values: HashSet<A>) {
         self.states[id.0 as usize]
-            .assosiations
+            .associations
             .extend(assosiated_values);
     }
 
-    pub fn assosiations(&self, id: StateId) -> Vec<A> {
+    pub fn associations(&self, id: StateId) -> Vec<A> {
         let state = &self[id];
-        state.assosiations.iter().cloned().collect::<Vec<A>>()
+        state.associations.iter().cloned().collect::<Vec<A>>()
     }
 
     pub fn find<I: AsRef<[u8]>>(&self, input: I) -> Result<StateId, Option<StateId>> {

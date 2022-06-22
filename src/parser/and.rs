@@ -91,7 +91,7 @@ where
             (None, None, Some(_)) => unreachable!("None, None, Some"),
             (None, Some(_), None) => unreachable!("None, Some, None"),
             (None, Some(b_state), Some((a_ext, a_out_index))) => {
-                // This state is reachable from the intial state (Some, None, None), and (Some, Some, None)
+                // This state is reachable from the initial state (Some, None, None), and (Some, Some, None)
 
                 let (_, a_out) = input.split_at(a_out_index);
 
@@ -119,7 +119,7 @@ where
                             }
                             None => {
                                 // The B parser has no more to give, and in this match arm the A parser also has nothing more
-                                // to give, resulting in this beeing final match for the And.
+                                // to give, resulting in this being final match for the And.
                                 return (Ok((a_ext.combine(b_ext), b_out)), None);
                             }
                         }
@@ -141,7 +141,7 @@ where
                                 );
                             }
                             None => {
-                                // No more matches comming from B parser, and since we in this branch dont expect any more from A, we know there wont
+                                // No more matches coming from B parser, and since we in this branch dont expect any more from A, we know there wont
                                 // be any more matches.
                                 return (Err(err), None);
                             }
@@ -212,11 +212,11 @@ where
             (Some(a_state), None, Some(_a_ext)) => {
                 // This branch is reachable from (Some, Some, Some)
 
-                // We had a match and no more matches are comming for B.
+                // We had a match and no more matches are coming for B.
                 // This means that we should parse a again,thereby reset/update the a_ext,
                 // and finally reset b_state to default.
 
-                // Note: this is the branch you are workin on.
+                // Note: this is the branch you are working on.
                 //let a_state_clone = a_state.clone();
 
                 return self.parse(
@@ -239,7 +239,7 @@ where
 
                 match (a_ext, a_state) {
                     (Ok((a_ext, a_out)), None) => {
-                        // We got a new match and no more new ones are comming for a parser.
+                        // We got a new match and no more new ones are coming for a parser.
                         // this leads us to (None,Some,Some)
                         let a_out_index = a_out.len();
                         return self.parse(
@@ -291,7 +291,7 @@ where
 
                 match (b_ext, b_state) {
                     (Ok((b_ext, b_out)), None) => {
-                        // We had a match and no more matches are comming for B.
+                        // We had a match and no more matches are coming for B.
                         // This means that on the next call we should parse a again,thereby
                         // reset/update the a_ext, and finally reset b_state to default.
 

@@ -6,19 +6,19 @@ use std::{
 };
 
 // This file implements early termination for dfa's. If we at some state in the
-// dfa only could get there by beeing on a spesiffic command, then we can mark the node as
+// dfa only could get there by being on a specific command, then we can mark the node as
 // early terminating.
 
 // How do we calculate this?
 
-// 1) For every command C, we can create a nfa. Assosiate all the ends with a C_end id, and
+// 1) For every command C, we can create a nfa. Associate all the ends with a C_end id, and
 //    the non ends with C_mid.
 //
 // 2) Combine all the command nfa's by or-ing them together. Then convert it to a dfa.
 //
 // 3) If any state in the dfa contains only ids from one command, then we cut off all of its outgoing edges
-//    and set the assosiated value to an apropriate C_end value. Thus signaling that a failed dfa.find() -> Err(state_id)
-//    might actually be a purpusfull termination.
+//    and set the associated value to an appropriate C_end value. Thus signaling that a failed dfa.find() -> Err(state_id)
+//    might actually be a purposeful termination.
 //
 // 4 a) Do a dfs to find all states reachable from the start. Remove the nodes that we cant reach.
 // 4 b) Remove all unused byteclasses (Edges).
@@ -47,8 +47,8 @@ impl<C: Copy + std::hash::Hash + PartialEq + Eq> CmdPos<C> {
 impl<C: Copy + std::hash::Hash + Eq + std::fmt::Debug> NFA<CmdPos<C>> {
     pub fn from_command_regex(regex: &str, id: C) -> anyhow::Result<Self> {
         let mut nfa = NFA::<CmdPos<C>>::regex(regex)?;
-        nfa.assosiate_ends(CmdPos::End(id));
-        nfa.asssosiate_non_ends(CmdPos::Mid(id));
+        nfa.associate_ends(CmdPos::End(id));
+        nfa.associate_non_ends(CmdPos::Mid(id));
         Ok(nfa)
     }
 
@@ -69,17 +69,17 @@ impl<C: Copy + std::hash::Hash + Eq + std::fmt::Debug> NFA<CmdPos<C>> {
         let dfa_id = dfa.push_state();
         nfa_to_dfa.insert(start_ids.clone(), dfa_id);
 
-        let assosiated_values = {
+        let associated_values = {
             let mut values = HashSet::new();
             for id in start_ids.iter() {
                 let state = &self[*id];
-                for a in state.assosiations.iter() {
+                for a in state.associations.iter() {
                     values.insert(*a);
                 }
             }
             values
         };
-        dfa.assosiate(dfa_id, assosiated_values);
+        dfa.associate(dfa_id, associated_values);
 
         while let Some(nfa_ids) = stack.pop() {
             let mut transitions = Vec::with_capacity(256);
@@ -89,7 +89,7 @@ impl<C: Copy + std::hash::Hash + Eq + std::fmt::Debug> NFA<CmdPos<C>> {
             let unique_assoc: Option<C> = {
                 let mut unique_assoc: Option<C> = None;
                 for state in nfa_ids.iter().map(|id| self[*id].clone()) {
-                    let assocs = state.assosiations;
+                    let assocs = state.associations;
 
                     if assocs.len() > 1 {
                         unique_assoc = None;
@@ -115,7 +115,7 @@ impl<C: Copy + std::hash::Hash + Eq + std::fmt::Debug> NFA<CmdPos<C>> {
 
             if let Some(c) = unique_assoc {
                 // Then we can make this dfa state a early termination.
-                dfa.assosiate(dfa_id, iter::once(CmdPos::End(c)).collect());
+                dfa.associate(dfa_id, iter::once(CmdPos::End(c)).collect());
                 dfa.set_transitions(dfa_id, vec![None; 256]);
                 continue;
             }
@@ -139,17 +139,17 @@ impl<C: Copy + std::hash::Hash + Eq + std::fmt::Debug> NFA<CmdPos<C>> {
                     let dfa_e_id = dfa.push_state();
                     nfa_to_dfa.insert(move_state_e.clone(), dfa_e_id);
 
-                    let assosiated_values = {
+                    let associated_values = {
                         let mut values = HashSet::new();
                         for id in move_state_e.iter() {
                             let state = &self[*id];
-                            for a in state.assosiations.iter() {
+                            for a in state.associations.iter() {
                                 values.insert(*a);
                             }
                         }
                         values
                     };
-                    dfa.assosiate(dfa_e_id, assosiated_values);
+                    dfa.associate(dfa_e_id, associated_values);
 
                     // Each time we generate a new DFA state, we must apply step 2 to it. The process is complete when applying step 2 does not yield any new states.
                     stack.push(move_state_e);
@@ -175,7 +175,7 @@ impl<C: Copy + std::hash::Hash + Eq + std::fmt::Debug> DFA<CmdPos<C>> {
         match self.find(input) {
             Ok(id) => {
                 let x = self
-                    .assosiations(id)
+                    .associations(id)
                     .into_iter()
                     .filter(|cp| cp.is_end())
                     .map(|cp| *cp.value())
@@ -185,7 +185,7 @@ impl<C: Copy + std::hash::Hash + Eq + std::fmt::Debug> DFA<CmdPos<C>> {
             Err(id) => match id {
                 Some(id) => {
                     let ends: Vec<C> = self
-                        .assosiations(id)
+                        .associations(id)
                         .into_iter()
                         .filter(|cp| cp.is_end())
                         .map(|cp| *cp.value())
@@ -194,7 +194,7 @@ impl<C: Copy + std::hash::Hash + Eq + std::fmt::Debug> DFA<CmdPos<C>> {
                         Ok(ends)
                     } else {
                         Err(self
-                            .assosiations(id)
+                            .associations(id)
                             .into_iter()
                             .map(|cp| *cp.value())
                             .collect())
@@ -214,7 +214,7 @@ mod tests {
     use super::CmdPos;
 
     #[test]
-    fn simple_assosiated_value_check_literal() {
+    fn simple_associated_value_check_literal() {
         let nfa = NFA::<CmdPos<usize>>::from_command_regex("his", 0).unwrap();
         let nfa = nfa
             .or(NFA::<CmdPos<usize>>::from_command_regex("hos", 1).unwrap())

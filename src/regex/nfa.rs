@@ -23,7 +23,7 @@ pub struct NfaState<A> {
     class: ByteClassId,
 
     pub(crate) epsilons: Vec<StateId>,
-    pub(crate) assosiations: HashSet<A>,
+    pub(crate) associations: HashSet<A>,
 }
 
 /// Returns the states one would get to from self if the input u8 was 'index'.
@@ -52,16 +52,16 @@ impl<A: Eq + std::hash::Hash> NfaState<A> {
             table: vec![vec![]],
             class: ByteClassId(0),
             epsilons: vec![],
-            assosiations: HashSet::new(),
+            associations: HashSet::new(),
         }
     }
 
     fn associate_with(&mut self, value: A) {
-        self.assosiations.insert(value);
+        self.associations.insert(value);
     }
 
     fn extend_association_with(&mut self, values: HashSet<A>) {
-        self.assosiations.extend(values)
+        self.associations.extend(values)
     }
 }
 
@@ -70,12 +70,12 @@ pub struct NFA<A: std::hash::Hash> {
     /// Represents the nodes in the NFA.
     pub(crate) states: Vec<NfaState<A>>,
 
-    /// Sort of represents the edges in the NFA. Every NfaState has a Vec of its neighbours. The byteclass values are used as a ofsett
-    /// into this neighbouring Vec. This is a space saving optimisation. The first value is always a completly empty byteclass.
+    /// Sort of represents the edges in the NFA. Every NfaState has a Vec of its neighbours. The byteclass values are used as a offset
+    /// into this neighbouring Vec. This is a space saving optimisation. The first value is always a completely empty byteclass.
     translations: IndexSet<ByteClass>,
 
     /// These are the termination states of the NFA. If a stream of bytes ends on one of these states, we consider it a
-    /// sucsess.
+    /// success.
     pub(crate) ends: Vec<StateId>,
 }
 
@@ -119,7 +119,7 @@ impl<A: std::hash::Hash> Index<(StateId, u8)> for NFA<A> {
 }
 
 impl<A: Copy + Eq + std::hash::Hash + Debug> NFA<A> {
-    /// Does not match anything, not even a enpty string.
+    /// Does not match anything, not even a empty string.
     pub fn empty() -> Self {
         Self {
             states: vec![NfaState::empty()],
@@ -165,7 +165,7 @@ impl<A: Copy + Eq + std::hash::Hash + Debug> NFA<A> {
                 state.class = ByteClassId::from(class_index as u16);
 
                 // We could now run a GC like procedure on the nfa, because nfa.transitions might contain a unused byteclass.
-                // this might be reasonable to do, but since we are anyways ging to discard the nfa and replace it by a dfa,
+                // this might be reasonable to do, but since we are anyways going to discard the nfa and replace it by a dfa,
                 // i would not worry about it to begin with.
             }
             x => {
@@ -223,49 +223,49 @@ impl<A: Copy + Eq + std::hash::Hash + Debug> NFA<A> {
         }
 
         // If self has a single end state, then we can forgo adding a epsilon transition.
-        // this optimisation is probably not nessesary to think about because in the convertion from nfa
+        // this optimisation is probably not necessary to think about because in the conversion from nfa
         // to dfa it is optimised away anyways. It would however probably make that step go faster.
 
-        let state_ofset = self.states.len();
+        let state_offset = self.states.len();
 
         for other_index in 0..other.states.len() {
             let mut state = other.states[other_index].clone();
 
-            // When adding the states from 'other' all the StateId's are shifted by 'state_ofset'
+            // When adding the states from 'other' all the StateId's are shifted by 'state_offset'
             state.table = state
                 .table
                 .iter_mut()
                 .map(|vec| {
                     vec.iter_mut()
-                        .map(|id| id.add(state_ofset))
+                        .map(|id| id.add(state_offset))
                         .collect::<Vec<_>>()
                 })
                 .collect();
 
-            // When adding the state from 'other' we need to add its byteclass. We can however not just shift the byteclassid by 'state_ofset', because
+            // When adding the state from 'other' we need to add its byteclass. We can however not just shift the byteclassid by 'state_offset', because
             // the byteclass might already be present in the 'self' nfa's  byteclass.
             let byteclass = other.index(state.class);
             let (i, _) = self.translations.insert_full(byteclass.clone());
             state.class = ByteClassId(i.try_into()?);
 
-            // Update epsilons, by shifting them by state_ofset
+            // Update epsilons, by shifting them by state_offset
             // @TODO handle convetion error from add.
             state.epsilons = state
                 .epsilons
                 .into_iter()
-                .map(|e| e.add(state_ofset))
+                .map(|e| e.add(state_offset))
                 .collect();
 
             self.states.push(state);
         }
 
         for old_end in self.ends.clone() {
-            self.push_epsilon(old_end, StateId(state_ofset as u32));
+            self.push_epsilon(old_end, StateId(state_offset as u32));
         }
         self.ends = other
             .ends
             .into_iter()
-            .map(|id| id.add(state_ofset))
+            .map(|id| id.add(state_offset))
             .collect();
 
         Ok(())
@@ -354,7 +354,7 @@ impl<A: Copy + Eq + std::hash::Hash + Debug> NFA<A> {
         let ends = mem::take(&mut nfa.ends);
         for end in ends {
             nfa.push_epsilon(end, c);
-            let assocs = mem::take(&mut nfa[end].assosiations);
+            let assocs = mem::take(&mut nfa[end].associations);
             nfa[d].extend_association_with(assocs);
         }
 
@@ -384,14 +384,14 @@ impl<A: Copy + Eq + std::hash::Hash + Debug> NFA<A> {
         Ok(nfa)
     }
 
-    pub fn assosiate_ends(&mut self, value: A) {
+    pub fn associate_ends(&mut self, value: A) {
         for e in &self.ends {
             let end = &mut self.states[e.0 as usize];
             end.associate_with(value);
         }
     }
 
-    pub fn asssosiate_non_ends(&mut self, value: A) {
+    pub fn associate_non_ends(&mut self, value: A) {
         let ends = &self.ends;
         for (id, state) in self.states.iter_mut().enumerate() {
             let state_id = StateId::of(id);
@@ -402,11 +402,11 @@ impl<A: Copy + Eq + std::hash::Hash + Debug> NFA<A> {
         }
     }
 
-    fn _end_assosiations(&self) -> HashSet<A> {
+    fn _end_associations(&self) -> HashSet<A> {
         let mut result = HashSet::new();
         for e in &self.ends {
             let end = &self.states[e.0 as usize];
-            result.extend(end.assosiations.clone());
+            result.extend(end.associations.clone());
         }
 
         result
@@ -576,8 +576,8 @@ mod tests {
     #[quickcheck]
     fn literal_param_ass(a: String, ass: usize) -> bool {
         let mut nfa = NFA::<usize>::literal(&a);
-        nfa.assosiate_ends(ass);
-        nfa._end_assosiations().contains(&ass)
+        nfa.associate_ends(ass);
+        nfa._end_associations().contains(&ass)
     }
 
     #[quickcheck]
@@ -588,11 +588,11 @@ mod tests {
 
         let mut nfa = NFA::<usize>::literal(&a);
         let mut nfb = NFA::<usize>::literal(&b);
-        nfa.assosiate_ends(ass);
-        nfb.assosiate_ends(bss);
+        nfa.associate_ends(ass);
+        nfb.associate_ends(bss);
 
         let or = nfa.or(nfb).unwrap();
-        let asses = or._end_assosiations();
+        let asses = or._end_associations();
         asses.contains(&ass) && asses.contains(&bss)
     }
 
@@ -604,8 +604,8 @@ mod tests {
 
         let mut nfa = NFA::<usize>::literal(&a);
         let mut nfb = NFA::<usize>::literal(&b);
-        nfa.assosiate_ends(ass);
-        nfb.assosiate_ends(bss);
+        nfa.associate_ends(ass);
+        nfb.associate_ends(bss);
 
         let or = nfa.or(nfb).unwrap();
 
@@ -615,8 +615,8 @@ mod tests {
         let a_end = a_ends.iter().find(|x| or.ends.contains(x)).unwrap();
         let b_end = b_ends.iter().find(|x| or.ends.contains(x)).unwrap();
 
-        let x = &or[*a_end].assosiations.contains(&ass);
-        let y = &or[*b_end].assosiations.contains(&bss);
+        let x = &or[*a_end].associations.contains(&ass);
+        let y = &or[*b_end].associations.contains(&bss);
 
         *x && *y
     }

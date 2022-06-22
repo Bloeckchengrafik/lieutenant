@@ -14,9 +14,9 @@ const THIRD: RangeInclusive<u8> = 224u8..=239;
 const FOURTH: RangeInclusive<u8> = 240..=247;
 
 /*
-Tabele for utf-8 byte layout. We need to generate a nfa that recognises a range.
+Table for utf-8 byte layout. We need to generate a nfa that recognises a range.
 Its sort of like creating a regular expression for a number between n and m.
-You think its easy, untill you realise there are a lot of edgecases.
+You think its easy, until you realise there are a lot of edge-cases.
 
 +-----------+-----------+-----------+-----------+----------------------+-----------------------------------+
 | 1st Byte  | 2nd Byte  | 3rd Byte  | 4th Byte  | Number of Free Bits  | Maximum Expressible Unicode Value |
@@ -301,7 +301,7 @@ fn below_or_eq_for_given_length<A: std::hash::Hash + Eq + Copy + std::fmt::Debug
         }
 
         _ => {
-            panic!("not a valid start on suposed utf-8 bytes")
+            panic!("not a valid start on supposed utf-8 bytes")
         }
     }
 }
@@ -414,7 +414,7 @@ fn more_or_eq_for_given_length<A: std::hash::Hash + Eq + Copy + std::fmt::Debug>
         }
 
         _ => {
-            panic!("Not a valid start byte for a suposed utf-8 char")
+            panic!("Not a valid start byte for a supposed utf-8 char")
         }
     }
 }
@@ -1061,10 +1061,10 @@ mod tests {
             'ଵ', 'ଶ', 'ଷ', 'ସ', '୵', '୶', '୷', 'வ', 'ஶ', 'ஷ', 'ᬵ', '㬵', '㭵', '㮵', '㯵', '㬶',
             '㬷', '䬷', //4 byte
             '😈', '😉', '😊', '🙈', '🚈', '🚉', '🙉', '🙇', '😌', '򟘈', '󟘈', '󜘈', '󄖄',
-            // edgecase ascii
-            '', '', '}', '~', '', // edgecase 2byte
-            'À', 'Á', 'Â', 'Ã', 'ß', 'Þ', 'Ý', '߿', '߾', '޿', // edgecase 3byte
-            'က', 'ခ', 'ဂ', '၀', 'ႀ', // edgecase 4 byte
+            // edge case ascii
+            '', '', '}', '~', '', // edge case 2byte
+            'À', 'Á', 'Â', 'Ã', 'ß', 'Þ', 'Ý', '߿', '߾', '޿', // edge case 3byte
+            'က', 'ခ', 'ဂ', '၀', 'ႀ', // edge case 4 byte
             '񀀀', '𿿿', '𿿾', '𿾿', '𾿿', '󿿿',
         ];
         let mut num = 0;

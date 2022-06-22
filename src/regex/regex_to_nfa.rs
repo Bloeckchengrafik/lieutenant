@@ -68,24 +68,24 @@ fn hir_to_nfa<A: std::hash::Hash + Eq + Copy + std::fmt::Debug>(
             }
         }
         regex_syntax::hir::HirKind::Anchor(x) => match x {
-            regex_syntax::hir::Anchor::StartLine => bail!("We dont suport StartLine symbols!"),
-            regex_syntax::hir::Anchor::EndLine => bail!("We dont suport EndLine symbols!"),
-            regex_syntax::hir::Anchor::StartText => bail!("We dont suport StartText symbol!"),
-            regex_syntax::hir::Anchor::EndText => bail!("We dont suport EndText symbol!"),
+            regex_syntax::hir::Anchor::StartLine => bail!("We dont support StartLine symbols!"),
+            regex_syntax::hir::Anchor::EndLine => bail!("We dont support EndLine symbols!"),
+            regex_syntax::hir::Anchor::StartText => bail!("We dont support StartText symbol!"),
+            regex_syntax::hir::Anchor::EndText => bail!("We dont support EndText symbol!"),
         },
         regex_syntax::hir::HirKind::WordBoundary(boundary) => {
             match boundary {
                 regex_syntax::hir::WordBoundary::Unicode => {
-                    todo!() // I dont know if we need to suport this
+                    todo!() // I dont know if we need to support this
                 }
                 regex_syntax::hir::WordBoundary::UnicodeNegate => {
-                    todo!() // I dont know if we need to suport this
+                    todo!() // I dont know if we need to support this
                 }
                 regex_syntax::hir::WordBoundary::Ascii => {
-                    todo!() // I dont know if we need to suport this
+                    todo!() // I dont know if we need to support this
                 }
                 regex_syntax::hir::WordBoundary::AsciiNegate => {
-                    todo!() // I dont know if we need to suport this
+                    todo!() // I dont know if we need to support this
                 }
             }
         }
@@ -104,7 +104,7 @@ fn hir_to_nfa<A: std::hash::Hash + Eq + Copy + std::fmt::Debug>(
                 }
                 regex_syntax::hir::RepetitionKind::Range(range) => match range {
                     // We dont care about greedy vs lazy ranges, since we only use the regex to detect
-                    // fullmatch, and dont care about matchgroups.
+                    // full match, and dont care about match-groups.
                     regex_syntax::hir::RepetitionRange::Exactly(exact) => {
                         println!("Exact branch");
                         let nfa = hir_to_nfa(&x.hir)?;
@@ -174,31 +174,31 @@ impl std::fmt::Debug for RegexConvertError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
             RegexConvertError::StartLine => {
-                write!(f,"We don't suprt start line in regex, so ^ is not allowed in the regex without escaping it with \\.")
+                write!(f,"We don't support start line in regex, so ^ is not allowed in the regex without escaping it with \\.")
             }
             RegexConvertError::EndLine => {
-                write!(f,"We don't suport end line in regex, so $ is not allowed in the regex  without escaping it with \\.")
+                write!(f,"We don't support end line in regex, so $ is not allowed in the regex  without escaping it with \\.")
             }
             RegexConvertError::StartText => {
-                write!(f,"We don't suport start text symbol in regex, so \\A is not allowed in the regex.")
+                write!(f,"We don't support start text symbol in regex, so \\A is not allowed in the regex.")
             }
             RegexConvertError::EndText => {
-                write!(f,"We don't suport end of text symbol in regex, so \\z is not allowed in the regex.")
+                write!(f,"We don't support end of text symbol in regex, so \\z is not allowed in the regex.")
             }
             RegexConvertError::WordBoundaryUnicode => {
                 write!(
                     f,
-                    "We don't suport unicode world boundary, so \\b is not allowed in the regex."
+                    "We don't support unicode world boundary, so \\b is not allowed in the regex."
                 )
             }
             RegexConvertError::WordBoundaryUnicodeNegate => {
-                write!(f,"We don't suport \"not a unicode world boundary\", so \\B is not allowed in the regex.")
+                write!(f,"We don't support \"not a unicode world boundary\", so \\B is not allowed in the regex.")
             }
             RegexConvertError::WordBoundaryAscii => {
-                write!(f,"We don't suport \"not a unicode world boundary\", so (?-u:\\b) is not allowed in the regex.")
+                write!(f,"We don't support \"not a unicode world boundary\", so (?-u:\\b) is not allowed in the regex.")
             }
             RegexConvertError::WordBoundaryAsciiNegate => {
-                write!(f,"We don't suport \"not a unicode world boundary\", so (?-u:\\B) is not allowed in the regex.")
+                write!(f,"We don't support \"not a unicode world boundary\", so (?-u:\\B) is not allowed in the regex.")
             }
 
             RegexConvertError::RegexParseError(err) => err.fmt(f),
@@ -206,21 +206,21 @@ impl std::fmt::Debug for RegexConvertError {
     }
 }
 
-/// Checks if regex contains a feature we don't suport, or it just cant be parsed as
-/// valid regex. If this test passes for a command, then the only other failurecase for
+/// Checks if regex contains a feature we don't support, or it just cant be parsed as
+/// valid regex. If this test passes for a command, then the only other failure case for
 /// creating a nfa is running out of StateId: u32.
-pub fn we_suport_regex(regex: &str) -> Result<(), RegexConvertError> {
+pub fn we_support_regex(regex: &str) -> Result<(), RegexConvertError> {
     let hir = Parser::new().parse(regex);
     let hir = match hir {
         Ok(x) => x,
         Err(e) => return Err(RegexConvertError::RegexParseError(e)),
     };
 
-    we_suport_hir(&hir)
+    we_support_hir(&hir)
 }
 
-/// Returns wheter or not we are able to parse regex. We dont suport certain features.
-fn we_suport_hir(hir: &regex_syntax::hir::Hir) -> Result<(), RegexConvertError> {
+/// Returns whether or not we are able to parse regex. We dont support certain features.
+fn we_support_hir(hir: &regex_syntax::hir::Hir) -> Result<(), RegexConvertError> {
     match hir.kind() {
         regex_syntax::hir::HirKind::Empty => Ok(()),
         regex_syntax::hir::HirKind::Literal(lit) => match lit {
@@ -254,7 +254,7 @@ fn we_suport_hir(hir: &regex_syntax::hir::Hir) -> Result<(), RegexConvertError> 
                 regex_syntax::hir::RepetitionKind::OneOrMore => Ok(()),
                 regex_syntax::hir::RepetitionKind::Range(range) => match range {
                     // We dont care about greedy vs lazy ranges, since we only use the regex to detect
-                    // fullmatch, and dont care about matchgroups.
+                    // full match, and dont care about match-groups.
                     regex_syntax::hir::RepetitionRange::Exactly(_) => Ok(()),
                     regex_syntax::hir::RepetitionRange::AtLeast(_) => Ok(()),
                     regex_syntax::hir::RepetitionRange::Bounded(_, _) => Ok(()),
@@ -268,7 +268,7 @@ fn we_suport_hir(hir: &regex_syntax::hir::Hir) -> Result<(), RegexConvertError> 
         },
         regex_syntax::hir::HirKind::Concat(cats) => {
             for meow in cats {
-                if let Err(x) = we_suport_hir(meow) {
+                if let Err(x) = we_support_hir(meow) {
                     return Err(x);
                 }
             }
@@ -276,7 +276,7 @@ fn we_suport_hir(hir: &regex_syntax::hir::Hir) -> Result<(), RegexConvertError> 
         }
         regex_syntax::hir::HirKind::Alternation(alts) => {
             for alt in alts {
-                if let Err(x) = we_suport_hir(alt) {
+                if let Err(x) = we_support_hir(alt) {
                     return Err(x);
                 }
             }
@@ -298,21 +298,21 @@ mod tests {
     use crate::regex::dfa::DFA;
 
     #[test]
-    fn test_we_dont_suport() {
+    fn test_we_dont_support() {
         let regex = "^";
-        assert!(we_suport_regex(regex).is_err());
+        assert!(we_support_regex(regex).is_err());
 
         let regex = "$";
-        assert!(we_suport_regex(regex).is_err());
+        assert!(we_support_regex(regex).is_err());
 
         let regex = "\\A";
-        assert!(we_suport_regex(regex).is_err());
+        assert!(we_support_regex(regex).is_err());
 
         let regex = "\\z";
-        assert!(we_suport_regex(regex).is_err());
+        assert!(we_support_regex(regex).is_err());
 
         let regex = "\\b";
-        assert!(we_suport_regex(regex).is_err());
+        assert!(we_support_regex(regex).is_err());
     }
 
     #[test]
@@ -366,7 +366,7 @@ mod tests {
     }
 
     #[test]
-    fn direct_sibtraction() {
+    fn direct_subtraction() {
         let nfa = NFA::<usize>::regex("[0-9--4]").unwrap();
         let dfa = DFA::<usize>::from(nfa);
 

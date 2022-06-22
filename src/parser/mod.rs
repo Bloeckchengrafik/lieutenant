@@ -16,18 +16,18 @@ pub use space::*;
 use crate::generic::Tuple;
 
 pub trait IterParser {
-    /// This assosiated type says what the return value is for the parser. If you have a parser that returns a i32, then set it to Extract = (i32,), or
-    /// if you dont want it returning anythin use Extract = ()
+    /// This associated type says what the return value is for the parser. If you have a parser that returns a i32, then set it to Extract = (i32,), or
+    /// if you dont want it returning anything use Extract = ()
     type Extract: Tuple;
 
     /// You probably just want to set it to (), and always return None in its place for 'fn parse(&self ...'
-    // Internaly we use this for the And, Or and the Optional parsers. This makes implementors of the Parser trait
+    // Internally we use this for the And, Or and the Optional parsers. This makes implementors of the Parser trait
     // generators of potential parsing results.
     type ParserState: Default;
 
     /// State is set to default at first call, and is thereafter the state that was returned on the last call.
-    /// this makes it so we can iterate over many possible attempts at parsin the input.
-    /// We have to do this becaue else its impossible to correctly parse (Option<u32>,  u32) from the input "42".
+    /// this makes it so we can iterate over many possible attempts at parsing the input.
+    /// We have to do this because else its impossible to correctly parse (Option<u32>,  u32) from the input "42".
     /// we first need to try parsing were the option consumes the 42, and then we need to try the case were it does not.
     #[allow(clippy::type_complexity)]
     fn parse<'p>(
@@ -40,9 +40,9 @@ pub trait IterParser {
     );
 
     /// This method should return a regex that recognises a language that is a superset of what the parser recognises.
-    /// Another way to put it. If the parser sucsessfully parses some input, then the regex should have matched the part
-    /// that it consumed, but it does not have to be the other way arround. Theoretically we could therefor always use '.*?'
-    /// as the regex, but then its not as usefull.
+    /// Another way to put it. If the parser successfully parses some input, then the regex should have matched the part
+    /// that it consumed, but it does not have to be the other way around. Theoretically we could therefor always use '.*?'
+    /// as the regex, but then its not as usefully.
     /// We use the regex as a heuristic to determine if a parser can parse some input. So if for example you expect a parser
     /// to be able to parse json then a suitable regex could be "\{.*?\}". Using this regex we can quickly determine what command
     /// a input belongs to.

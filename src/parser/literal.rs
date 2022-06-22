@@ -28,7 +28,7 @@ impl IterParser for Literal {
             .flat_map(|c| c.to_lowercase())
             .peekable();
         let literal_lower = &mut self.value.chars().flat_map(|c| c.to_lowercase()).peekable();
-        let mut ofsett = 0;
+        let mut offset = 0;
 
         loop {
             match (literal_lower.next(), input_lower.next()) {
@@ -38,7 +38,7 @@ impl IterParser for Literal {
                 }
                 (None, Some(' ')) => {
                     // We have reached the end of the literal, and the next input char is a space
-                    return (Ok(((), &input[ofsett..])), None);
+                    return (Ok(((), &input[offset..])), None);
                 }
                 (None, Some(c)) => {
                     // We have reached the end of the literal, and the next input char is not a space.
@@ -62,7 +62,7 @@ impl IterParser for Literal {
                 }
                 (Some(lit_c), Some(inp_c)) => {
                     if lit_c == inp_c {
-                        ofsett += lit_c.len_utf8();
+                        offset += lit_c.len_utf8();
                         continue;
                     } else {
                         return (Err(anyhow!("Literal did not match input")), None);

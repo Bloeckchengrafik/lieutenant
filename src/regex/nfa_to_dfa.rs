@@ -49,17 +49,17 @@ impl<A: Eq + std::hash::Hash + Copy + Debug> From<NFA<A>> for DFA<A> {
         let dfa_id = dfa.push_state();
         nfa_to_dfa.insert(start_ids.clone(), dfa_id);
 
-        let assosiated_values = {
+        let associated_values = {
             let mut values = HashSet::new();
             for id in start_ids.iter() {
                 let state = &nfa[*id];
-                for a in state.assosiations.iter() {
+                for a in state.associations.iter() {
                     values.insert(*a);
                 }
             }
             values
         };
-        dfa.assosiate(dfa_id, assosiated_values);
+        dfa.associate(dfa_id, associated_values);
 
         while let Some(nfa_ids) = stack.pop() {
             let mut transitions = Vec::with_capacity(256);
@@ -85,17 +85,17 @@ impl<A: Eq + std::hash::Hash + Copy + Debug> From<NFA<A>> for DFA<A> {
                     let dfa_e_id = dfa.push_state();
                     nfa_to_dfa.insert(move_state_e.clone(), dfa_e_id);
 
-                    let assosiated_values = {
+                    let associated_values = {
                         let mut values = HashSet::new();
                         for id in move_state_e.iter() {
                             let state = &nfa[*id];
-                            for a in state.assosiations.iter() {
+                            for a in state.associations.iter() {
                                 values.insert(*a);
                             }
                         }
                         values
                     };
-                    dfa.assosiate(dfa_e_id, assosiated_values);
+                    dfa.associate(dfa_e_id, associated_values);
 
                     // Each time we generate a new DFA state, we must apply step 2 to it. The process is complete when applying step 2 does not yield any new states.
                     stack.push(move_state_e);
@@ -123,15 +123,15 @@ mod tests {
     use crate::regex::{dfa::DFA, NFA};
 
     #[test]
-    fn simple_assosiated_value_check_literal() {
+    fn simple_associated_value_check_literal() {
         let mut nfa = NFA::<usize>::literal("hi");
-        nfa.assosiate_ends(42);
+        nfa.associate_ends(42);
 
         let dfa: DFA<usize> = nfa.into();
 
         match dfa.find("hi") {
             Ok(x) => {
-                assert!(dfa[x].is_assosiated_with(&42))
+                assert!(dfa[x].is_associated_with(&42))
             }
             Err(_) => {
                 panic!()
@@ -141,14 +141,14 @@ mod tests {
 
     #[quickcheck]
     fn qc_nfa_to_dfa(mut case: NFAQtCase) -> bool {
-        case.nfa.assosiate_ends(42);
+        case.nfa.associate_ends(42);
 
         let dfa: DFA<usize> = case.nfa.clone().into();
 
         for x in case.matches.iter() {
             match dfa.find(x.as_str()) {
                 Ok(x) => {
-                    if !dfa[x].is_assosiated_with(&42) {
+                    if !dfa[x].is_associated_with(&42) {
                         println!("HEYOOOO {:?}", case.nfa);
                         println!("Wooooo: {:?}", x);
                         println!("Woot?: {:?}", dfa[x]);
