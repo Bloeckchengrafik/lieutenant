@@ -51,8 +51,8 @@ where
         loop {
             match self.parser.parse(state, input) {
                 (Ok((ext, _)), _) => return Ok(self.mapping.call(ext).call(gamestate)),
-                (Err(_), None) => {
-                    bail!("Not able to parse input");
+                (Err(e), None) => {
+                    bail!("Not able to parse input: {:?}", e);
                 }
                 (Err(_), Some(next_state)) => state = next_state,
             }

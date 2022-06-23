@@ -38,7 +38,7 @@ impl IterParser for U32Parser {
         }
 
         match input[0..=index].parse::<u32>() {
-            Ok(number) => (Ok(((number,), input)), None),
+            Ok(number) => (Ok(((number,), &input[index+1..input.len()])), None),
             Err(_) => (Err(anyhow::anyhow!("Not a number")), None),
         }
     }

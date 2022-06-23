@@ -99,9 +99,9 @@ mod tests {
                 }
             });
         let suc = command.call(("Hello", 10), "/args 42 42");
-        assert!(suc.is_ok());
+        assert!(suc.is_ok(), "{:?}", suc);
         let suc = command.call(("Hello", 10), "/args 24 42");
-        assert!(suc.is_ok());
+        assert!(suc.is_ok(), "{:?}", suc);
         let fail = command.call(("Hello", 10), "/args abc 42");
         assert!(fail.is_err());
         let fail = command.call(("Hello", 10), "/args abc abc");

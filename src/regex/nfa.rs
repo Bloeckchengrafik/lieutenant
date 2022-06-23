@@ -493,7 +493,7 @@ mod tests {
                 head_nfa.followed_by(tail_nfa).unwrap();
                 assert!(
                     head_nfa._find(format!("{}{}", head, tail).as_str()).is_ok(),
-                    format!("{}{}", head, tail)
+                    "{}{}", head, tail
                 );
             }
         }
@@ -540,15 +540,15 @@ mod tests {
 
             assert!(
                 nfa._find(format!("").as_str()).is_ok(),
-                format!("{} zero", t)
+                "{} zero", t
             );
             assert!(
                 nfa._find(t.to_string().as_str()).is_ok(),
-                format!("{} one", t)
+                "{} one", t
             );
             assert!(
                 nfa._find(format!("{}{}", t, t).as_str()).is_ok(),
-                format!("{} two", t)
+                "{} two", t
             );
         }
     }
