@@ -6,6 +6,7 @@ Command dispatcher for Rust based on Mojang's Brigadier
 
 - [Installation](#installation)
 - [A simple example](#a-simple-example)
+- [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
 
