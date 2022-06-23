@@ -980,7 +980,7 @@ mod tests {
     //     }
     // }
 
-    #[test]
+    // #[test]
     // fn test_failing() {
     //     let from = '𿾿';
     //     let to = '򟘈';
