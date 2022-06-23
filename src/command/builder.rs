@@ -87,6 +87,97 @@ mod tests {
     }
 
     #[test]
+    fn multiple_args() {
+        let command = literal("/args")
+            .space()
+            .arg::<u32>()
+            .space()
+            .arg::<u32>()
+            .on_call(|x, y| {
+                move |s: &str, u: usize | {
+                    println!("multiple args with {x} {y} {s} {u}");
+                }
+            });
+        let suc = command.call(("Hello", 10), "/args 42 42");
+        assert!(suc.is_ok());
+        let suc = command.call(("Hello", 10), "/args 24 42");
+        assert!(suc.is_ok());
+        let fail = command.call(("Hello", 10), "/args abc 42");
+        assert!(fail.is_err());
+        let fail = command.call(("Hello", 10), "/args abc abc");
+        assert!(fail.is_err());
+        let fail = command.call(("Hello", 10), "/args 42 abc");
+        assert!(fail.is_err());
+        let fail = command.call(("Hello", 10), "/args 42");
+        assert!(fail.is_err());
+
+    }
+
+    #[test]
+    fn multiple_literals() {
+        let command = literal("/lit")
+            .space()
+            .literal("literal")
+            .on_call(|| {
+                move |s: &str, u: usize| {
+                    println!("{s}, {u}");
+                }
+            });
+        let suc = command.call(("Hello", 10), "/lit literal");
+        let fail = command.call(("Hello", 10), "/lit fail");
+        let much = command.call(("Hello", 10), "/lit literal another");
+        assert!(suc.is_ok());
+        assert!(fail.is_err());
+        assert!(much.is_err()); // @TODO Evaluate if this should fail, because it matches the base command but has more literals
+    }
+
+    #[test]
+    fn multiple_duplicate_literals() {
+        let command  = literal("/lit")
+            .space()
+            .literal("lit")
+            .on_call(|| {
+                move |s: &str, u: usize| {
+                    println!("{s}, {u}");
+                }
+            });
+        let suc = command.call(("Hello", 10), "/lit lit");
+        let fail = command.call(("Hello", 10), "/lit notlit");
+        let much = command.call(("Hello", 10), "/lit lit lit");
+        assert!(suc.is_ok());
+        assert!(fail.is_err());
+        assert!(much.is_err()); // @TODO Evaluate if this should fail, because it matches the base command but has more literals
+    }
+
+    #[test]
+    fn multiple_literals_with_args() {
+        let command = literal("/lit")
+            .space()
+            .arg::<u32>()
+            .space()
+            .literal("literal")
+            .on_call(|arg: u32| {
+                move |s: &str, u: usize| {
+                    println!("Multiple literals with args {arg} {s} {u}");
+                }
+            });
+
+        let suc = command.call(("Hello", 10), "/lit 42 literal");
+        assert!(suc.is_ok());
+        let fail = command.call(("Hello", 10), "/lit literal");
+        assert!(fail.is_err());
+        let fail = command.call(("Hello", 10), "/lit literal 42");
+        assert!(fail.is_err());
+        let fail = command.call(("Hello", 10), "/lit 42");
+        assert!(fail.is_err());
+        let fail = command.call(("Hello", 10), "/lit literal");
+        assert!(fail.is_err());
+        let fail = command.call(("Hello", 10), "/lit 42 lit");
+        assert!(fail.is_err());
+
+    }
+
+    #[test]
     fn case() {
         let cmd: CommandSpec<(&mut usize, &mut usize), usize, _, _, _> = literal("/echo")
             .space()
