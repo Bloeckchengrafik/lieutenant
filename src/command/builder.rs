@@ -44,16 +44,16 @@ where
         }
     }
 
-    fn followed_by<P: IterParser>(self, other: P) -> And<Self::Parser, P> {
-        And { a: self, b: other }
-    }
-
     fn space(self) -> And<Self::Parser, OneOrMoreSpace> {
         self.followed_by(space())
     }
 
     fn literal(self, str: &str) -> And<Self::Parser, parser::Literal> {
         self.followed_by(literal(str))
+    }
+
+    fn followed_by<P: IterParser>(self, other: P) -> And<Self::Parser, P> {
+        And { a: self, b: other }
     }
 
     fn on_call<GameState, CommandResult, F1, F2>(

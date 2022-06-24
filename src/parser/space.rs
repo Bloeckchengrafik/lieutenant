@@ -14,7 +14,7 @@ impl Default for OnceState {
 
 pub struct OneOrMoreSpace;
 pub struct MaybeSpaces {
-    pub(crate) nothing_should_follow: bool
+    pub nothing_should_follow: bool
 }
 
 impl MaybeSpaces {
