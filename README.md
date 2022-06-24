@@ -21,6 +21,9 @@ lieutenant = { git = "https://github.com/feather-rs/lieutenant" }
 # A simple example
 
 ```rust
+use crate::command::builder::{literal, space, CommandBuilder};
+use crate::command::Command;
+
 fn main() {
     let command = literal("/").space().arg::<u32>();
     let x = command.on_call(|x| {

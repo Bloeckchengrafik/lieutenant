@@ -58,7 +58,7 @@ impl IterParser for OneOrMoreSpace {
         let before_len = input.len();
         let out = input.trim_start();
         if out.len() == before_len {
-            (Err(anyhow!("Expected a space")), None)
+            (Err(anyhow!("Expected a space at input '{}'", input)), None)
         } else {
             (Ok(((), out)), None)
         }
@@ -85,7 +85,7 @@ impl IterParser for MaybeSpaces {
         let out = input.trim_start();
 
         if self.nothing_should_follow && out.len() != 0 {
-            return (Err(anyhow!("Expected end of string")), None);
+            return (Err(anyhow!("Expected end of string, got {}", out)), None);
         };
 
         (Ok(((), out)), None)
