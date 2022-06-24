@@ -126,7 +126,7 @@ mod tests {
 
         let res = eval.evaluate_all(input);
 
-        assert!(res.len() == 1);
+        assert_eq!(res.len(), 1);
         assert!(res[0].is_err());
     }
 
@@ -140,7 +140,7 @@ mod tests {
 
         let eval = Evaluator::new(&lit);
         let res = eval.evaluate_all(input);
-        assert!(res.len() == 1);
-        assert!(res.get(0).unwrap().as_ref().unwrap().1 == " me");
+        assert_eq!(res.len(), 1);
+        assert_eq!(res.get(0).unwrap().as_ref().unwrap().1, " me");
     }
 }

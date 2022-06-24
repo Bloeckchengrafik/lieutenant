@@ -42,10 +42,6 @@ where
     type GameState = GameState;
     type CommandResult = CommandResult;
 
-    fn regex(&self) -> String {
-        self.parser.regex()
-    }
-
     fn call(&self, gamestate: GameState, input: &str) -> anyhow::Result<CommandResult> {
         let mut state = P::ParserState::default();
         loop {
@@ -57,5 +53,9 @@ where
                 (Err(_), Some(next_state)) => state = next_state,
             }
         }
+    }
+
+    fn regex(&self) -> String {
+        self.parser.regex()
     }
 }

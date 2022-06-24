@@ -65,7 +65,7 @@ where
         F2: Func<GameState, Output = CommandResult>,
     {
         CommandSpec {
-            parser: self.followed_by(MaybeSpaces),
+            parser: self.followed_by(MaybeSpaces{nothing_should_follow: true}),
             mapping: f,
             gamestate: Default::default(),
             command_result: Default::default(),
@@ -128,7 +128,7 @@ mod tests {
         let much = command.call(("Hello", 10), "/lit literal another");
         assert!(suc.is_ok());
         assert!(fail.is_err());
-        assert!(much.is_err()); // @TODO Evaluate if this should fail, because it matches the base command but has more literals
+        assert!(much.is_err()); // We agreed on not tolerating args after the end of the command.
     }
 
     #[test]
@@ -146,7 +146,7 @@ mod tests {
         let much = command.call(("Hello", 10), "/lit lit lit");
         assert!(suc.is_ok());
         assert!(fail.is_err());
-        assert!(much.is_err()); // @TODO Evaluate if this should fail, because it matches the base command but has more literals
+        assert!(much.is_err()); // See above.
     }
 
     #[test]

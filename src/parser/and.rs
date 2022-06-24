@@ -127,23 +127,23 @@ where
                     Err(err) => {
                         // We did not have a match
 
-                        match b_state {
+                        return match b_state {
                             Some(b_state) => {
                                 // More possible matches from the B parser. This leads us back to this match branch on the next call to parse.
                                 let a_out_index = a_out.len();
-                                return (
+                                (
                                     Err(err),
                                     Some(AndState {
                                         a_state: None,
                                         a_ext: Some((a_ext, a_out_index)),
                                         b_state: Some(b_state),
                                     }),
-                                );
+                                )
                             }
                             None => {
                                 // No more matches coming from B parser, and since we in this branch dont expect any more from A, we know there wont
                                 // be any more matches.
-                                return (Err(err), None);
+                                (Err(err), None)
                             }
                         }
                     }
@@ -155,25 +155,25 @@ where
 
                 let (a_ext, a_state) = self.a.parse(a_state, input);
 
-                match a_ext {
+                return match a_ext {
                     Err(err) => {
                         match a_state {
                             None => {
                                 // A has no more possibilities, and we did not get a match, so we return the error, and signal that
                                 // the and has no possible matches.
-                                return (Err(err), None);
+                                (Err(err), None)
                             }
                             Some(a_state) => {
                                 // We did not have a match but we have more attempts for the A parser available, this leads us back to this
                                 // match arm on the next call.
-                                return (
+                                (
                                     Err(err),
                                     Some(AndState {
                                         a_state: Some(a_state),
                                         a_ext: None,
                                         b_state: None,
                                     }),
-                                );
+                                )
                             }
                         }
                     }
@@ -183,27 +183,27 @@ where
                             Some(a_state) => {
                                 // This leads us into  (Some, Some, Some)
                                 let a_out_index = a_out.len();
-                                return self.parse(
+                                self.parse(
                                     AndState {
                                         a_state: Some(a_state),
                                         a_ext: Some((a_ext, a_out_index)),
                                         b_state: Some(B::ParserState::default()),
                                     },
                                     input,
-                                );
+                                )
                             }
                             None => {
                                 // No more inputs are possible for A, leading us into (None, Some,Some)
 
                                 let a_out_index = input.len() - a_out.len();
-                                return self.parse(
+                                self.parse(
                                     AndState {
                                         a_state: None,
                                         a_ext: Some((a_ext, a_out_index)),
                                         b_state: Some(B::ParserState::default()),
                                     },
                                     input,
-                                );
+                                )
                             }
                         }
                     }
@@ -237,47 +237,47 @@ where
 
                 let (a_ext, a_state) = self.a.parse(a_state, input);
 
-                match (a_ext, a_state) {
+                return match (a_ext, a_state) {
                     (Ok((a_ext, a_out)), None) => {
                         // We got a new match and no more new ones are coming for a parser.
                         // this leads us to (None,Some,Some)
                         let a_out_index = a_out.len();
-                        return self.parse(
+                        self.parse(
                             AndState {
                                 a_state: None,
                                 a_ext: Some((a_ext, a_out_index)),
                                 b_state: Some(b_state),
                             },
                             input,
-                        );
+                        )
                     }
                     (Ok((a_ext, a_out)), Some(a_state)) => {
                         // This leads us into the Some, Some, Some branch
                         let a_out_index = a_out.len();
-                        return self.parse(
+                        self.parse(
                             AndState {
                                 a_state: Some(a_state),
                                 a_ext: Some((a_ext, a_out_index)),
                                 b_state: Some(b_state),
                             },
                             input,
-                        );
+                        )
                     }
                     (Err(err), None) => {
                         // We had no match, and no more matches possible for the a parser.
-                        return (Err(err), None);
+                        (Err(err), None)
                     }
                     (Err(err), Some(a_state)) => {
                         // We had no match but more matches are possible for the a parser.
                         // This leads us back to this branch in the next call to parse.
-                        return (
+                        (
                             Err(err),
                             Some(AndState {
                                 a_state: Some(a_state),
                                 a_ext: None,
                                 b_state: Some(b_state),
                             }),
-                        );
+                        )
                     }
                 }
             }
@@ -289,7 +289,7 @@ where
                 let (_, a_out) = input.split_at(a_out_index);
                 let (b_ext, b_state) = self.b.parse(b_state, a_out);
 
-                match (b_ext, b_state) {
+                return match (b_ext, b_state) {
                     (Ok((b_ext, b_out)), None) => {
                         // We had a match and no more matches are coming for B.
                         // This means that on the next call we should parse a again,thereby
@@ -297,52 +297,52 @@ where
 
                         // This results in the (Some, None, Some) on the next call.
                         let cloned_a_ext = a_ext.clone();
-                        return (
+                        (
                             Ok((a_ext.combine(b_ext), b_out)),
                             Some(AndState {
                                 a_state: Some(a_state),
                                 a_ext: Some((cloned_a_ext, a_out_index)),
                                 b_state: None,
                             }),
-                        );
+                        )
                     }
                     (Ok((b_ext, b_out)), Some(b_state)) => {
                         // We had a match and there are more potential matches for B.
                         // This results in (Some, Some, Some), returning to this branch on the next call.
                         let cloned_a_ext = a_ext.clone();
-                        return (
+                        (
                             Ok((a_ext.combine(b_ext), b_out)),
                             Some(AndState {
                                 a_state: Some(a_state),
                                 a_ext: Some((cloned_a_ext, a_out_index)),
                                 b_state: Some(b_state),
                             }),
-                        );
+                        )
                     }
                     (Err(err), None) => {
                         // We found nothing and there are no more to get for the B parser.
                         // We therefor reset the B state, and remove (a_ext, a_out).
                         // This moves us into the (Some, Some, None) branch
-                        return (
+                        (
                             Err(err),
                             Some(AndState {
                                 a_state: Some(a_state),
                                 a_ext: None,
                                 b_state: Some(B::ParserState::default()),
                             }),
-                        );
+                        )
                     }
                     (Err(err), Some(b_state)) => {
                         // We found nothing, but there are more to get from the B parser
                         // This sends us back to this branch on the next call to parse.
-                        return (
+                        (
                             Err(err),
                             Some(AndState {
                                 a_state: Some(a_state),
                                 a_ext: Some((a_ext, a_out_index)),
                                 b_state: Some(b_state),
                             }),
-                        );
+                        )
                     }
                 }
             }
@@ -374,9 +374,9 @@ mod tests {
 
         let res = eval.evaluate_all(input);
 
-        assert!(res.len() == 1);
+        assert_eq!(res.len(), 1);
         assert!(res.get(0).unwrap().is_ok());
-        assert!(res.len() == 1);
+        assert_eq!(res.len(), 1);
     }
 
     #[test]
@@ -396,7 +396,7 @@ mod tests {
         let eval = crate::parser::Evaluator::new(&and);
         let res = eval.evaluate_all(input);
 
-        assert!(res.len() == 2);
+        assert_eq!(res.len(), 2);
         assert!(res[0].is_ok());
         assert!(res[1].is_err());
     }
@@ -421,7 +421,7 @@ mod tests {
 
         let res = eval.evaluate_all(input);
 
-        assert!(res.len() == 2);
+        assert_eq!(res.len(), 2);
         assert!(res[0].is_err());
         assert!(res[1].is_ok());
     }
@@ -448,7 +448,7 @@ mod tests {
 
         let res = eval.evaluate_all(input);
 
-        assert!(res.len() == 3);
+        assert_eq!(res.len(), 3);
         assert!(res[0].is_err());
         assert!(res[1].is_err());
         assert!(res[2].is_ok());
@@ -478,7 +478,7 @@ mod tests {
             let res = eval.evaluate_all(input.as_str());
 
             //println!("{:?}",res);
-            assert!(res.len() == 4);
+            assert_eq!(res.len(), 4);
             assert!(res.iter().all(|x| x.is_ok()));
         }
     }

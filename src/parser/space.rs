@@ -13,11 +13,13 @@ impl Default for OnceState {
 }
 
 pub struct OneOrMoreSpace;
-pub struct MaybeSpaces;
+pub struct MaybeSpaces {
+    pub(crate) nothing_should_follow: bool
+}
 
 impl MaybeSpaces {
     pub fn new() -> Self {
-        Self {}
+        Self { nothing_should_follow: false }
     }
 }
 
@@ -81,6 +83,11 @@ impl IterParser for MaybeSpaces {
         Option<Self::ParserState>,
     ) {
         let out = input.trim_start();
+
+        if self.nothing_should_follow && out.len() != 0 {
+            return (Err(anyhow!("Expected end of string")), None);
+        };
+
         (Ok(((), out)), None)
     }
 
