@@ -59,7 +59,7 @@ Every Command must start with either a String Literal or a Space
 
 Other literals, spaces and arguments can now be chained after that initial statement.
 
-Arguments can be added with the `arg::<Type>()` function. Currently, only `u32`-Args are supported.
+Arguments can be added with the `arg::<Type>()` function. Currently, only `u32` and `String` are supported as argument types.
 
 The `command.on_call`-Method uses a closure as an argument that will be executed once the command is called with the
 arguments.
