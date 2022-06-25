@@ -75,12 +75,12 @@ mod tests {
         let command = literal("/test").space().arg::<String>().space().arg::<String>();
         let x = command.on_call(|x, y| {
             move |expected1, expected2| {
-                println!("{:?} {:?}", x, y);
                 assert_eq!(x, expected1);
                 assert_eq!(y, expected2);
                 42
             }
         });
+
 
         let suc = x.call(("100", "e"), "/test 100 e");
         assert!(suc.is_ok(), "{:?}", suc);
