@@ -1,6 +1,6 @@
 use crate::argument::Argument;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StringWildcard {
     wildcard: String,
 }
@@ -19,6 +19,7 @@ impl StringWildcard {
     }
 }
 
+#[derive(Default)]
 pub struct StringWildcardParser {}
 
 impl crate::parser::IterParser for StringWildcardParser {
@@ -36,7 +37,7 @@ impl crate::parser::IterParser for StringWildcardParser {
     ) {
         let string = input.trim();
 
-        if string.len() == 0 {
+        if string.is_empty() {
             return (Err(anyhow::anyhow!("Empty input")), None);
         }
         (Ok(((StringWildcard { wildcard: string.to_string() }, ), "")), None)
@@ -48,11 +49,6 @@ impl crate::parser::IterParser for StringWildcardParser {
     }
 }
 
-impl Default for StringWildcardParser {
-    fn default() -> Self {
-        StringWildcardParser {}
-    }
-}
 
 impl Argument for StringWildcard {
     type Parser = StringWildcardParser;
@@ -68,10 +64,10 @@ mod tests {
     #[test]
     fn one_argument() {
         let command = literal("/test").space().arg::<StringWildcard>();
-        let x = command.on_call(|x| {
+        let x = command.on_call(|x: StringWildcard| {
             move |expected, _| {
                 println!("{:?}", x);
-                //assert_eq!(x, expected);
+                assert_eq!(expected, x.get());
                 42
             }
         });
@@ -80,6 +76,9 @@ mod tests {
         assert!(suc.is_ok(), "{:?}", suc);
 
         let suc = x.call(("täst test test", 1), "/test täst test test");
+        assert!(suc.is_ok(), "{:?}", suc);
+
+        let suc = x.call(("🍵 🫖", 1), "/test 🍵 🫖");
         assert!(suc.is_ok(), "{:?}", suc);
 
         let err = x.call(("", 1), "/test ");
