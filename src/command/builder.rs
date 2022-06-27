@@ -1,4 +1,5 @@
 use super::CommandSpec;
+use crate::parser::Opt;
 use crate::{
     argument::Argument,
     generic::Func,
@@ -19,7 +20,9 @@ pub fn literal(value: &str) -> parser::Literal {
 pub trait CommandBuilder {
     type Parser: IterParser;
     fn arg<A: Argument>(self) -> And<Self::Parser, <A as Argument>::Parser>;
+    fn opt_arg<A: Argument>(self) -> And<Self::Parser, Opt<A::Parser>>;
     fn space(self) -> And<Self::Parser, OneOrMoreSpace>;
+    fn opt_space(self) -> And<Self::Parser, MaybeSpaces>;
     fn literal(self, literal: &str) -> And<Self::Parser, parser::Literal>;
     fn followed_by<P: IterParser>(self, parser: P) -> And<Self::Parser, P>;
     fn on_call<GameState, CommandResult, F1, F2>(
@@ -44,8 +47,21 @@ where
         }
     }
 
+    fn opt_arg<A: Argument>(self) -> And<Self::Parser, Opt<A::Parser>> {
+        And {
+            a: self,
+            b: Opt {
+                parser: A::Parser::default(),
+            },
+        }
+    }
+
     fn space(self) -> And<Self::Parser, OneOrMoreSpace> {
         self.followed_by(space())
+    }
+
+    fn opt_space(self) -> And<Self::Parser, MaybeSpaces> {
+        self.followed_by(MaybeSpaces {})
     }
 
     fn literal(self, str: &str) -> And<Self::Parser, parser::Literal> {
@@ -65,7 +81,7 @@ where
         F2: Func<GameState, Output = CommandResult>,
     {
         CommandSpec {
-            parser: self.followed_by(MaybeSpaces{nothing_should_follow: true}),
+            parser: self.followed_by(MaybeSpaces {}),
             mapping: f,
             gamestate: Default::default(),
             command_result: Default::default(),
@@ -94,7 +110,7 @@ mod tests {
             .space()
             .arg::<u32>()
             .on_call(|x, y| {
-                move |s: &str, u: usize | {
+                move |s: &str, u: usize| {
                     println!("multiple args with {x} {y} {s} {u}");
                 }
             });
@@ -110,19 +126,15 @@ mod tests {
         assert!(fail.is_err());
         let fail = command.call(("Hello", 10), "/args 42");
         assert!(fail.is_err());
-
     }
 
     #[test]
     fn multiple_literals() {
-        let command = literal("/lit")
-            .space()
-            .literal("literal")
-            .on_call(|| {
-                move |s: &str, u: usize| {
-                    println!("{s}, {u}");
-                }
-            });
+        let command = literal("/lit").space().literal("literal").on_call(|| {
+            move |s: &str, u: usize| {
+                println!("{s}, {u}");
+            }
+        });
         let suc = command.call(("Hello", 10), "/lit literal");
         let fail = command.call(("Hello", 10), "/lit fail");
         let much = command.call(("Hello", 10), "/lit literal another");
@@ -133,14 +145,11 @@ mod tests {
 
     #[test]
     fn multiple_duplicate_literals() {
-        let command  = literal("/lit")
-            .space()
-            .literal("lit")
-            .on_call(|| {
-                move |s: &str, u: usize| {
-                    println!("{s}, {u}");
-                }
-            });
+        let command = literal("/lit").space().literal("lit").on_call(|| {
+            move |s: &str, u: usize| {
+                println!("{s}, {u}");
+            }
+        });
         let suc = command.call(("Hello", 10), "/lit lit");
         let fail = command.call(("Hello", 10), "/lit notlit");
         let much = command.call(("Hello", 10), "/lit lit lit");
@@ -174,7 +183,6 @@ mod tests {
         assert!(fail.is_err());
         let fail = command.call(("Hello", 10), "/lit 42 lit");
         assert!(fail.is_err());
-
     }
 
     #[test]

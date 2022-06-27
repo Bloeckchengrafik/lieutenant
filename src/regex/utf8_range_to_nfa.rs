@@ -1107,7 +1107,10 @@ mod tests {
                                 "ERROR from:{} to:{} value:{} should be accepted",
                                 from, to, value
                             );
-                            panic!("ERROR from:{} to:{} value:{} should be accepted", from, to, value);
+                            panic!(
+                                "ERROR from:{} to:{} value:{} should be accepted",
+                                from, to, value
+                            );
                         }
                     } else if dfa.find(&string).is_ok() {
                         let mut from_buff = [0u8; 4];

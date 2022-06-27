@@ -493,7 +493,9 @@ mod tests {
                 head_nfa.followed_by(tail_nfa).unwrap();
                 assert!(
                     head_nfa._find(format!("{}{}", head, tail).as_str()).is_ok(),
-                    "{}{}", head, tail
+                    "{}{}",
+                    head,
+                    tail
                 );
             }
         }
@@ -512,7 +514,7 @@ mod tests {
     fn repeat_param0(lit: String) -> bool {
         let head_nfa = NFA::<usize>::literal(lit.as_str());
         let nfa = head_nfa.repeat().unwrap();
-        nfa._find(format!("").as_str()).is_ok()
+        nfa._find("").is_ok()
     }
 
     #[quickcheck]
@@ -538,17 +540,12 @@ mod tests {
             let head_nfa = NFA::<usize>::literal(t);
             let nfa = head_nfa.repeat().unwrap();
 
-            assert!(
-                nfa._find(format!("").as_str()).is_ok(),
-                "{} zero", t
-            );
-            assert!(
-                nfa._find(t.to_string().as_str()).is_ok(),
-                "{} one", t
-            );
+            assert!(nfa._find("").is_ok(), "{} zero", t);
+            assert!(nfa._find(t.to_string().as_str()).is_ok(), "{} one", t);
             assert!(
                 nfa._find(format!("{}{}", t, t).as_str()).is_ok(),
-                "{} two", t
+                "{} two",
+                t
             );
         }
     }

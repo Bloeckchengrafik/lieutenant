@@ -2,6 +2,7 @@ use crate::generic::Tuple;
 
 use super::IterParser;
 
+#[derive(Debug)]
 pub struct Opt<P> {
     pub(crate) parser: P,
 }
@@ -103,7 +104,7 @@ mod tests {
 
         let res = eval.evaluate_all(input);
 
-        //assert!(res.iter().all(|x| x.is_ok()));
+        assert!(res.iter().all(|x| x.is_ok()));
         println!("{:?}", res);
     }
 
@@ -122,7 +123,7 @@ mod tests {
         let res = eval.evaluate_all(input);
         assert!(res.get(0).unwrap().is_err());
         assert!(res.get(1).unwrap().is_ok());
-        assert!(res.len() == 2);
+        assert_eq!(res.len(), 2);
     }
 
     #[test]

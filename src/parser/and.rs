@@ -145,7 +145,7 @@ where
                                 // be any more matches.
                                 (Err(err), None)
                             }
-                        }
+                        };
                     }
                 }
             }
@@ -207,7 +207,7 @@ where
                             }
                         }
                     }
-                }
+                };
             }
             (Some(a_state), None, Some(_a_ext)) => {
                 // This branch is reachable from (Some, Some, Some)
@@ -279,7 +279,7 @@ where
                             }),
                         )
                     }
-                }
+                };
             }
             (Some(a_state), Some(b_state), Some((a_ext, a_out_index))) => {
                 // This state is reachable from the entrypoint (Some,None,None)
@@ -344,7 +344,7 @@ where
                             }),
                         )
                     }
-                }
+                };
             }
         }
     }

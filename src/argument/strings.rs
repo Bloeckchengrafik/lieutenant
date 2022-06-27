@@ -1,11 +1,11 @@
-use crate::parser::IterParser;
 use super::Argument;
+use crate::parser::IterParser;
 
 #[derive(Default)]
 pub struct StringParser {}
 
 impl IterParser for StringParser {
-    type Extract = (String, );
+    type Extract = (String,);
 
     type ParserState = ();
 
@@ -26,14 +26,16 @@ impl IterParser for StringParser {
 
         let pos = string.find(' ').unwrap_or(string.len());
 
-        (Ok(((string[0..pos].to_string(), ), &string[pos..string.len()])), None)
+        (
+            Ok(((string[0..pos].to_string(),), &string[pos..string.len()])),
+            None,
+        )
     }
 
     fn regex(&self) -> String {
         "\\S+".into()
     }
 }
-
 
 impl Argument for String {
     type Parser = StringParser;
@@ -49,26 +51,32 @@ mod tests {
     fn one_argument() {
         let command = literal("/test").space().arg::<String>();
         let x = command.on_call(|x| {
-            move |expected, _| {
+            move |expected, should_match| {
                 println!("{:?}", x);
-                assert_eq!(x, expected);
+                if should_match {
+                    assert_eq!(x, expected);
+                }
                 42
             }
         });
 
-        let suc = x.call(("100", 1), "/test 100 ");
+        let suc = x.call(("100", true), "/test 100 ");
         assert!(suc.is_ok(), "{:?}", suc);
 
-        let suc = x.call(("ewqbe", 1), "/test ewqbe");
+        let suc = x.call(("ewqbe", true), "/test ewqbe");
         assert!(suc.is_ok(), "{:?}", suc);
 
-        let err = x.call(("test", 1), "/test te st");
+        let err = x.call(("test", false), "/test te st");
         assert!(err.is_err());
     }
 
     #[test]
     fn more_arguments() {
-        let command = literal("/test").space().arg::<String>().space().arg::<String>();
+        let command = literal("/test")
+            .space()
+            .arg::<String>()
+            .space()
+            .arg::<String>();
         let x = command.on_call(|x, y| {
             move |expected1, expected2| {
                 assert_eq!(x, expected1);
@@ -76,7 +84,6 @@ mod tests {
                 42
             }
         });
-
 
         let suc = x.call(("100", "e"), "/test 100 e");
         assert!(suc.is_ok(), "{:?}", suc);

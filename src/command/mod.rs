@@ -44,9 +44,19 @@ where
 
     fn call(&self, gamestate: GameState, input: &str) -> anyhow::Result<CommandResult> {
         let mut state = P::ParserState::default();
+
+        let regex = regex::Regex::new(&*self.parser.regex()).unwrap();
+
         loop {
             match self.parser.parse(state, input) {
-                (Ok((ext, _)), _) => return Ok(self.mapping.call(ext).call(gamestate)),
+                (Ok((ext, _)), _) => {
+                    if !regex.replace(input, "").is_empty() {
+                        // Only check if we have reached the end of the input to get more specific error messages.
+                        bail!("Too many arguments");
+                    }
+
+                    return Ok(self.mapping.call(ext).call(gamestate));
+                }
                 (Err(e), None) => {
                     bail!("Not able to parse input: {:?}", e);
                 }

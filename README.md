@@ -62,6 +62,9 @@ Other literals, spaces and arguments can now be chained after that initial state
 Arguments can be added with the `arg::<Type>()` function. Currently, `u32` and `String` are supported as argument types.
 Additionally, there is a `StringWildcard` type you can use to catch a String with spaces in it. After this, you can't add any other argument types.
 
+You can also add optional arguments (`opt_arg::<Type>()`) or spaces (`opt_space()`).
+Note that when using `opt_arg`, the  data type in the closure is `Option<(Type,)>`.
+
 The `command.on_call`-Method uses a closure as an argument that will be executed once the command is called with the
 arguments.
 With `move |game_state, ...|`, one can access the game state given by the call method.

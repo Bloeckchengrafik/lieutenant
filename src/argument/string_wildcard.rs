@@ -23,7 +23,7 @@ impl StringWildcard {
 pub struct StringWildcardParser {}
 
 impl crate::parser::IterParser for StringWildcardParser {
-    type Extract = (StringWildcard, );
+    type Extract = (StringWildcard,);
     type ParserState = ();
 
     #[allow(clippy::type_complexity)]
@@ -32,7 +32,7 @@ impl crate::parser::IterParser for StringWildcardParser {
         _state: Self::ParserState,
         input: &'p str,
     ) -> (
-        anyhow::Result<((StringWildcard, ), &'p str)>,
+        anyhow::Result<((StringWildcard,), &'p str)>,
         Option<Self::ParserState>,
     ) {
         let string = input.trim();
@@ -40,15 +40,21 @@ impl crate::parser::IterParser for StringWildcardParser {
         if string.is_empty() {
             return (Err(anyhow::anyhow!("Empty input")), None);
         }
-        (Ok(((StringWildcard { wildcard: string.to_string() }, ), "")), None)
-
+        (
+            Ok((
+                (StringWildcard {
+                    wildcard: string.to_string(),
+                },),
+                "",
+            )),
+            None,
+        )
     }
 
     fn regex(&self) -> String {
         ".*".into()
     }
 }
-
 
 impl Argument for StringWildcard {
     type Parser = StringWildcardParser;
@@ -57,7 +63,7 @@ impl Argument for StringWildcard {
 
 #[cfg(test)]
 mod tests {
-    use crate::argument::{StringWildcard};
+    use crate::argument::StringWildcard;
     use crate::command::builder::{literal, CommandBuilder};
     use crate::command::Command;
 

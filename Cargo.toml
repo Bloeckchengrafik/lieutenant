@@ -8,6 +8,7 @@ edition = "2018"
 anyhow = "1.0"
 indexmap = "1.6"
 regex-syntax = "0.6.18"
+regex = "1.5.6"
 
 [dev-dependencies]
 quickcheck = "1"

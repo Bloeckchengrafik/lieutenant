@@ -174,16 +174,16 @@ impl std::fmt::Debug for RegexConvertError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
             RegexConvertError::StartLine => {
-                write!(f,"We don't support start line in regex, so ^ is not allowed in the regex without escaping it with \\.")
+                write!(f, "We don't support start line in regex, so ^ is not allowed in the regex without escaping it with \\.")
             }
             RegexConvertError::EndLine => {
-                write!(f,"We don't support end line in regex, so $ is not allowed in the regex  without escaping it with \\.")
+                write!(f, "We don't support end line in regex, so $ is not allowed in the regex  without escaping it with \\.")
             }
             RegexConvertError::StartText => {
-                write!(f,"We don't support start text symbol in regex, so \\A is not allowed in the regex.")
+                write!(f, "We don't support start text symbol in regex, so \\A is not allowed in the regex.")
             }
             RegexConvertError::EndText => {
-                write!(f,"We don't support end of text symbol in regex, so \\z is not allowed in the regex.")
+                write!(f, "We don't support end of text symbol in regex, so \\z is not allowed in the regex.")
             }
             RegexConvertError::WordBoundaryUnicode => {
                 write!(
@@ -192,13 +192,13 @@ impl std::fmt::Debug for RegexConvertError {
                 )
             }
             RegexConvertError::WordBoundaryUnicodeNegate => {
-                write!(f,"We don't support \"not a unicode world boundary\", so \\B is not allowed in the regex.")
+                write!(f, "We don't support \"not a unicode world boundary\", so \\B is not allowed in the regex.")
             }
             RegexConvertError::WordBoundaryAscii => {
-                write!(f,"We don't support \"not a unicode world boundary\", so (?-u:\\b) is not allowed in the regex.")
+                write!(f, "We don't support \"not a unicode world boundary\", so (?-u:\\b) is not allowed in the regex.")
             }
             RegexConvertError::WordBoundaryAsciiNegate => {
-                write!(f,"We don't support \"not a unicode world boundary\", so (?-u:\\B) is not allowed in the regex.")
+                write!(f, "We don't support \"not a unicode world boundary\", so (?-u:\\B) is not allowed in the regex.")
             }
 
             RegexConvertError::RegexParseError(err) => err.fmt(f),
@@ -293,7 +293,6 @@ impl<A: std::hash::Hash + Eq + Copy + std::fmt::Debug> NFA<A> {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use crate::regex::dfa::DFA;
 
@@ -334,9 +333,8 @@ mod tests {
             assert!(dfa.find(case).is_ok());
         }
 
-        for case in &["fu"] {
-            assert!(dfa.find(case).is_err());
-        }
+        let case = &"fu";
+        assert!(dfa.find(case).is_err());
     }
 
     #[test]
@@ -347,9 +345,8 @@ mod tests {
         for case in &["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"] {
             assert!(dfa.find(case).is_ok());
         }
-        for case in &["a"] {
-            assert!(dfa.find(case).is_err());
-        }
+        let case = &"a";
+        assert!(dfa.find(case).is_err());
     }
 
     #[test]
