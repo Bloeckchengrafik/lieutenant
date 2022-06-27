@@ -84,7 +84,7 @@ impl IterParser for MaybeSpaces {
     ) {
         let out = input.trim_start();
 
-        if self.nothing_should_follow && out.len() != 0 {
+        if self.nothing_should_follow && !out.is_empty() {
             return (Err(anyhow!("Expected end of string, got {}", out)), None);
         };
 

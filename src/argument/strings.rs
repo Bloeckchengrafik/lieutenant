@@ -1,6 +1,7 @@
 use crate::parser::IterParser;
 use super::Argument;
 
+#[derive(Default)]
 pub struct StringParser {}
 
 impl IterParser for StringParser {
@@ -19,11 +20,11 @@ impl IterParser for StringParser {
     ) {
         let string = input.trim();
 
-        if string.len() == 0 {
+        if string.is_empty() {
             return (Err(anyhow::anyhow!("Empty input")), None);
         }
 
-        let pos = string.find(" ").unwrap_or(string.len());
+        let pos = string.find(' ').unwrap_or(string.len());
 
         (Ok(((string[0..pos].to_string(), ), &string[pos..string.len()])), None)
     }
@@ -33,11 +34,6 @@ impl IterParser for StringParser {
     }
 }
 
-impl Default for StringParser {
-    fn default() -> Self {
-        Self {}
-    }
-}
 
 impl Argument for String {
     type Parser = StringParser;

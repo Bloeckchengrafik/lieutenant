@@ -34,7 +34,7 @@ impl IterParser for Literal {
             match (literal_lower.next(), input_lower.next()) {
                 (None, None) => {
                     // Then the two str had the same length and were identical up to that point
-                    return (Ok(((), &"")), None);
+                    return (Ok(((), "")), None);
                 }
                 (None, Some(' ')) => {
                     // We have reached the end of the literal, and the next input char is a space

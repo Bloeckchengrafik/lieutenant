@@ -6,6 +6,7 @@ pub struct Map<P, F> {
     pub(crate) map: F,
 }
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct MapState<S> {
     state: S,
 }

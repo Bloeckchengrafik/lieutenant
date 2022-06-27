@@ -1,7 +1,7 @@
 use crate::parser::IterParser;
 
 use super::Argument;
-
+#[derive(Default)]
 pub struct U32Parser {}
 
 impl IterParser for U32Parser {
@@ -45,12 +45,6 @@ impl IterParser for U32Parser {
 
     fn regex(&self) -> String {
         "[\\+|-]?\\d+".into()
-    }
-}
-
-impl Default for U32Parser {
-    fn default() -> Self {
-        Self {}
     }
 }
 
