@@ -41,6 +41,8 @@ fn main() {
 
 This outputs `hi 100 the gamestate was 0`.
 
+More and specific examples can be found in the form of tests. You can find the most important ones either in the `lib.rs` file or under `argument/` for specific argument types. 
+
 # Usage
 
 To use the basic command system, import
@@ -64,6 +66,8 @@ Additionally, there is a `StringWildcard` type you can use to catch a String wit
 
 You can also add optional arguments (`opt_arg::<Type>()`) or spaces (`opt_space()`).
 Note that when using `opt_arg`, the  data type in the closure is `Option<(Type,)>`.
+
+If you want the caller to choose between arguments, use `choice(vec![<Argument>, <Argument>, ...])` or `opt_choice(vec![<Argument>, <Argument>, ...])`. The Return-Type of this is `String` or `Option<(String,)>`, depending on whether the argument is optional.
 
 The `command.on_call`-Method uses a closure as an argument that will be executed once the command is called with the
 arguments.
