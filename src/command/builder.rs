@@ -1,4 +1,5 @@
 use super::CommandSpec;
+use crate::argument::ChoiceParser;
 use crate::parser::Opt;
 use crate::{
     argument::Argument,
@@ -23,6 +24,8 @@ pub trait CommandBuilder {
     fn opt_arg<A: Argument>(self) -> And<Self::Parser, Opt<A::Parser>>;
     fn space(self) -> And<Self::Parser, OneOrMoreSpace>;
     fn opt_space(self) -> And<Self::Parser, MaybeSpaces>;
+    fn choice(self, args: Vec<String>) -> And<Self::Parser, ChoiceParser>;
+    fn opt_choice(self, args: Vec<String>) -> And<Self::Parser, Opt<ChoiceParser>>;
     fn literal(self, literal: &str) -> And<Self::Parser, parser::Literal>;
     fn followed_by<P: IterParser>(self, parser: P) -> And<Self::Parser, P>;
     fn on_call<GameState, CommandResult, F1, F2>(
@@ -62,6 +65,22 @@ where
 
     fn opt_space(self) -> And<Self::Parser, MaybeSpaces> {
         self.followed_by(MaybeSpaces {})
+    }
+
+    fn choice(self, args: Vec<String>) -> And<Self::Parser, ChoiceParser> {
+        And {
+            a: self,
+            b: ChoiceParser::new(args),
+        }
+    }
+
+    fn opt_choice(self, args: Vec<String>) -> And<Self::Parser, Opt<ChoiceParser>> {
+        And {
+            a: self,
+            b: Opt {
+                parser: ChoiceParser::new(args),
+            },
+        }
     }
 
     fn literal(self, str: &str) -> And<Self::Parser, parser::Literal> {

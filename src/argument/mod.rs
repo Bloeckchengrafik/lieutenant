@@ -1,8 +1,10 @@
+mod choice;
 mod numbers;
 mod string_wildcard;
 mod strings;
 
 use crate::parser::IterParser;
+pub use choice::*;
 pub use numbers::*;
 pub use string_wildcard::*;
 pub use strings::*;
