@@ -1,3 +1,4 @@
+mod boolean;
 mod choice;
 mod numbers;
 mod string_wildcard;
