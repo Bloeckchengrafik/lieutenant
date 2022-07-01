@@ -5,7 +5,7 @@ use crate::parser::IterParser;
 pub struct BoolParser;
 
 impl IterParser for BoolParser {
-    type Extract = (bool,);
+    type Extract = (bool, );
     type ParserState = ();
 
     fn parse<'p>(
@@ -25,8 +25,8 @@ impl IterParser for BoolParser {
         let pos = string.find(' ').unwrap_or(string.len());
 
         return match &string[..pos] {
-            "false" => (Ok(((false,), &string[pos..string.len()])), None),
-            "true" => (Ok(((true,), &string[pos..string.len()])), None),
+            "false" => (Ok(((false, ), &string[pos..string.len()])), None),
+            "true" => (Ok(((true, ), &string[pos..string.len()])), None),
             _ => (Err(anyhow::anyhow!("Invalid input (not a boolean)")), None),
         };
     }
@@ -110,5 +110,21 @@ mod tests {
         assert!(fail.is_err());
         let fail = command.call(("false test 1234", false), "/test false test 1234");
         assert!(fail.is_err());
+    }
+
+
+    #[test]
+    fn bool_split() {
+        let command = literal("/test").space().arg::<bool>()
+            .on_call(|arg: bool| {
+                move |_s: &str, _u: bool| {
+                    println!("boolean argument {arg}");
+                }
+            });
+
+        let suc = command.call(("fa lse", false), "/lit fa lse");
+        assert!(suc.is_err());
+        let suc = command.call(("tr ue", false), "/lit tr ue");
+        assert!(suc.is_err());
     }
 }
