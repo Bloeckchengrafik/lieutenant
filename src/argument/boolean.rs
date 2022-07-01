@@ -49,7 +49,7 @@ mod tests {
     #[test]
     fn test_boolean() {
         let command = literal("/lit").space().arg::<bool>().on_call(|arg: bool| {
-            move |s: &str, u: usize| {
+            move |_s: &str, _u: usize| {
                 println!("boolean argument {arg}");
             }
         });
@@ -68,6 +68,7 @@ mod tests {
         assert!(fail.is_err());
     }
 
+    #[allow(clippy::bool_comparison)]
     #[test]
     fn bool_with_other_args() {
         let command: CommandSpec<(&str, bool), bool, _, _, _> = literal("/test")
