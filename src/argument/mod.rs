@@ -1,8 +1,8 @@
+mod boolean;
 mod choice;
 mod numbers;
 mod string_wildcard;
 mod strings;
-mod boolean;
 
 use crate::parser::IterParser;
 pub use choice::*;

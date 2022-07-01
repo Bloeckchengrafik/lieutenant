@@ -1,11 +1,11 @@
-use crate::parser::IterParser;
 use super::Argument;
+use crate::parser::IterParser;
 
 #[derive(Default)]
 pub struct BoolParser;
 
 impl IterParser for BoolParser {
-    type Extract = (bool, );
+    type Extract = (bool,);
     type ParserState = ();
 
     fn parse<'p>(
@@ -25,22 +25,10 @@ impl IterParser for BoolParser {
         let pos = string.find(' ').unwrap_or(string.len());
 
         return match &string[..pos] {
-            "false" => {
-                (
-                    Ok(((false, ), &string[pos..string.len()])),
-                    None
-                )
-            }
-            "true" => {
-                (
-                    Ok(((true, ), &string[pos..string.len()])),
-                    None
-                )
-            }
-            _ => {
-                (Err(anyhow::anyhow!("Invalid input (not a boolean)")), None)
-            }
-        }
+            "false" => (Ok(((false,), &string[pos..string.len()])), None),
+            "true" => (Ok(((true,), &string[pos..string.len()])), None),
+            _ => (Err(anyhow::anyhow!("Invalid input (not a boolean)")), None),
+        };
     }
 
     fn regex(&self) -> String {
@@ -82,7 +70,7 @@ mod tests {
 
     #[test]
     fn bool_with_other_args() {
-        let command: CommandSpec<(&str, bool), bool, _,_, _> = literal("/test")
+        let command: CommandSpec<(&str, bool), bool, _, _, _> = literal("/test")
             .space()
             .arg::<u32>()
             .space()
@@ -95,8 +83,6 @@ mod tests {
                     b
                 }
             });
-
-
 
         let suc = command.call(("123 false test", true), "/test 123 false test");
         assert!(suc.is_ok() && suc.unwrap() == false); // not replaced with a negation to improve readability
