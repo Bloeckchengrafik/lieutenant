@@ -2,6 +2,7 @@ mod choice;
 mod numbers;
 mod string_wildcard;
 mod strings;
+mod bool;
 
 use crate::parser::IterParser;
 pub use choice::*;
